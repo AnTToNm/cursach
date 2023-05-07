@@ -1,4 +1,3 @@
-
 import './App.css';
 import HeaderComponent from "./components/headerComponents/HeaderComponent";
 import MainComponent from "./components/mainComponent/MainComponent";
