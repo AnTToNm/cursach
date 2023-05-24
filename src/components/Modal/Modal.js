@@ -61,6 +61,7 @@ const Modal = (props) => {
 
         if (response.ok) {
             console.log('nice')
+            onClose();
         }
     };
     useEffect(() => {

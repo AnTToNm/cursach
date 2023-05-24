@@ -2,6 +2,7 @@ import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import styled from "styled-components";
 
+
 const ContItem = styled.div`
   display: flex;
   width: 47vw;

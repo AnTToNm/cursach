@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {TableWrapper, Table, TD, TH, TR} from './TableReports.style';
+import {TableWrapper, Table, TD, TH, TR, Str, ButtonStr} from './TableReports.style';
 import {FaSort, FaSortUp, FaSortDown} from 'react-icons/fa';
 
 const TableReports = () => {
@@ -102,17 +102,17 @@ const TableReports = () => {
                     ))}
                 </tbody>
             </Table>
-            <div>
+            <Str>
                 <p>
                     Page {page} of {totalPages}
                 </p>
                 {page > 1 && (
-                    <button onClick={() => handlePageChange(page - 1)}>Prev</button>
+                    <ButtonStr onClick={() => handlePageChange(page - 1)}>Prev</ButtonStr>
                 )}
                 {page < totalPages && (
-                    <button onClick={() => handlePageChange(page + 1)}>Next</button>
+                    <ButtonStr onClick={() => handlePageChange(page + 1)}>Next</ButtonStr>
                 )}
-            </div>
+            </Str>
         </TableWrapper>
     );
 };
