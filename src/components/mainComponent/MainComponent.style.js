@@ -95,8 +95,8 @@ export const StyledForm = styled.div`
   align-items: flex-start;
   margin-top: 40px;
   background: green;
-  margin-left: 25%;
-  margin-right: 25%;
+  margin-left: 10%;
+  margin-right: 10%;
   border-radius: 15px;
 `
 

@@ -44,6 +44,7 @@ const Stroke = styled.div`
 `
 
 const FormReport = () => {
+    const [groups, setGroups] = useState([]);
     const currentDate = new Date().toISOString().slice(0, 16);
     const [selectedAnimal, setSelectedAnimal] = useState('selectedAnimal');
     const initialValues = {
@@ -54,6 +55,16 @@ const FormReport = () => {
         quantity: '',
         weight: '',
         note: '',
+    };
+
+    const handleAddGroup = () => {
+        setGroups([...groups, { number: "", data: currentDate, event: "", animal: selectedAnimal, quantity: "", weight: "", note: "" }]);
+    };
+
+    const handleGroupChange = (index, field, value) => {
+        const updatedGroups = [...groups];
+        updatedGroups[index][field] = value;
+        setGroups(updatedGroups);
     };
 
     const validationSchema = Yup.object({
@@ -70,12 +81,16 @@ const FormReport = () => {
                 ...values,
                 animal: selectedAnimal,
             };
+
+            const someGroup = {
+                groups: groups,
+            };
             const response = await fetch("http://localhost:3001/cattle-report", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(formData, someGroup),
             });
             const data = await response.json();
             console.log('Response:', data);
@@ -95,7 +110,8 @@ const FormReport = () => {
                 onSubmit={values => console.log(JSON.stringify(values))}>
             {({isSubmitting, isValid, dirty, values, resetForm}) => (
                 <Form style={{marginRight: 'auto', marginLeft: 'auto', display: 'flex'}}>
-                    <Stroke>
+                    <Stroke>{groups.map((group, index) => (
+                        <div key={index} >
                         <ContItem>
                             <Field type='number' name='number' placeholder='Код_животного' as={InputStyle}/>
                             <ErrorMessage name='number' component='div' className='ErrorMessages'/>
@@ -113,7 +129,7 @@ const FormReport = () => {
                                 value={selectedAnimal}
                                 onChange={handleChange} // Добавляем обработчик handleChange к полю animal
                             >
-                            {({field}) => (
+                                {({field}) => (
                                     <div style={{width: '7vw', height: '1.5vw'}}>
                                         <select style={{width: '7vw', height: '1.5vw'}} {...field}
                                                 value={selectedAnimal}
@@ -160,7 +176,11 @@ const FormReport = () => {
                             <Field type='textarea' name='note' placeholder='Примечание' as={InputStyle}/>
                             <ErrorMessage name='note' component='div' className='ErrorMessages'/>
                         </ContItem>
+                        </div>))}
                     </Stroke>
+                    <button type="button" onClick={handleAddGroup}>
+                        +
+                    </button>
                     <Submit type='submit' disabled={!(isValid && dirty) || isSubmitting} onClick={async () => {
                         isSubmitting = true
                         await handleSubmit(values)
@@ -169,7 +189,7 @@ const FormReport = () => {
                         {isSubmitting ? 'Загрузка...' : 'Отправить'}
                     </Submit>
                 </Form>
-                )}
+            )}
         </Formik>
     )
 }

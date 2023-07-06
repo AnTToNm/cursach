@@ -11,6 +11,40 @@ const bcrypt = require('bcrypt')
 const userDto = require("./dtos/user-dto");
 const tokenService = require('./services/token-services')
 
+app.post('/cattle-otchet', async (req, res, next) => {
+    try {
+        await knex('otchet').insert({
+            animal: req.body.animal,
+            data: req.body.data,
+            quantity: req.body.quantity,
+        })
+        res.send("Отчет успешно отправлен!")
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.get('/cattle-otchet', async (req, res) => {
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 20;
+    const sortColumn = req.query.column || 'data';
+    const sortDirection = req.query.direction || 'asc';
+
+    const offset = (page - 1) * limit;
+
+    const [countResult, reports] = await Promise.all([
+        knex.withSchema("public").count("* as count").from("otchet").first(),
+        knex.withSchema("public")
+            .select("*")
+            .from("otchet")
+            .orderBy(sortColumn, sortDirection)
+            .limit(limit)
+            .offset(offset),
+    ]);
+    const total_pages = Math.ceil(countResult.count / limit);
+    res.send({ results: reports, total_pages });
+})
+
 app.post('/cattle-report', async (req, res, next) => {
     try {
         await knex('report').insert({
@@ -18,9 +52,7 @@ app.post('/cattle-report', async (req, res, next) => {
             data: req.body.data,
             event: req.body.event,
             animal: req.body.animal,
-            typeAnimal: req.body.typeAnimal,
             quantity: req.body.quantity,
-            measurement: req.body.measurement,
             weight: req.body.weight,
             note: req.body.note
         })
@@ -50,6 +82,29 @@ app.get("/cattle-report", async (req, res) => {
     const total_pages = Math.ceil(countResult.count / limit);
     res.send({ results: report, total_pages });
 });
+
+// Удаление записи из таблицы report
+app.delete('/cattle-report/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        await knex('report').where('id', id).del();
+        res.send('Запись успешно удалена');
+    } catch (e) {
+        next(e);
+    }
+})
+
+// Обновление записи в таблице report
+app.put('/cattle-report/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const { number, data, event, animal, quantity, weight, note } = req.body;
+        await knex('report').where('id', id).update({ number, data, event, animal, quantity, weight, note });
+        res.send('Запись успешно обновлена');
+    } catch (e) {
+        next(e);
+    }
+})
 
 app.post("/registration", body('email').isEmail(), body('password').isLength({
     min: 6, max: 36

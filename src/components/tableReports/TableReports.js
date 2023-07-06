@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
-import {TableWrapper, Table, TD, TH, TR, Str, ButtonStr} from './TableReports.style';
-import {FaSort, FaSortUp, FaSortDown} from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { TableWrapper, Table, TD, TH, TR, Str, ButtonStr, Modal, ModalContent } from './TableReports.style';
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const TableReports = () => {
     const [data, setData] = useState([]);
@@ -8,14 +8,18 @@ const TableReports = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [sortColumn, setSortColumn] = useState('data');
     const [sortDirection, setSortDirection] = useState('desc');
+    const [editItemId, setEditItemId] = useState(null);
+    const [editedValues, setEditedValues] = useState({});
+    const [showModal, setShowModal] = useState(false);
+
+    const fetchData = async () => {
+        const response = await fetch(`http://localhost:3001/cattle-report?page=${page}&limit=10&column=${sortColumn}&direction=${sortDirection}`);
+        const { results, total_pages } = await response.json();
+        setData(results);
+        setTotalPages(total_pages);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch(`http://localhost:3001/cattle-report?page=${page}&limit=10&column=${sortColumn}&direction=${sortDirection}`);
-            const {results, total_pages} = await response.json();
-            setData(results);
-            setTotalPages(total_pages);
-        };
         fetchData();
     }, [page, sortColumn, sortDirection]);
 
@@ -25,10 +29,8 @@ const TableReports = () => {
 
     const handleSort = (column) => {
         if (sortColumn === column) {
-            // If the same column was clicked again, toggle the sort direction
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
         } else {
-            // Otherwise, sort by the new column in ascending order
             setSortColumn(column);
             setSortDirection('asc');
         }
@@ -36,14 +38,63 @@ const TableReports = () => {
 
     const getSortIcon = (column) => {
         if (sortColumn === column) {
-            return sortDirection === 'asc' ? <FaSortUp/> : <FaSortDown/>;
+            return sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />;
         } else {
-            return <FaSort/>;
+            return <FaSort />;
         }
+    };
+
+    const handleDelete = async (id) => {
+        await fetch(`http://localhost:3001/cattle-report/${id}`, {
+            method: 'DELETE',
+        });
+        // После удаления обновляем данные
+        fetchData();
+    };
+
+    const handleUpdate = async (id, newData) => {
+        await fetch(`http://localhost:3001/cattle-report/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newData),
+        });
+        // После обновления обновляем данные
+        fetchData();
+    };
+
+    const handleEdit = (id) => {
+        const itemToEdit = data.find(item => item.id === id);
+        setEditItemId(id);
+        setEditedValues(itemToEdit);
+        setShowModal(true);
+    };
+
+    const handleSave = (id) => {
+        handleUpdate(id, editedValues);
+        setEditItemId(null);
+        setEditedValues({});
+        setShowModal(false);
+    };
+
+    const handleCancel = () => {
+        setEditItemId(null);
+        setEditedValues({});
+        setShowModal(false);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedValues((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
     };
 
     return (
         <TableWrapper>
+            <h2 style={{ display: 'flex', justifyContent: 'center' }}>Таблица Изменений</h2>
             <Table>
                 <thead>
                 <TR>
@@ -59,14 +110,8 @@ const TableReports = () => {
                     <TH onClick={() => handleSort('animal')}>
                         Животное {getSortIcon('animal')}
                     </TH>
-                    <TH onClick={() => handleSort('typeAnimal')}>
-                        Вид {getSortIcon('typeAnimal')}
-                    </TH>
                     <TH onClick={() => handleSort('quantity')}>
                         Количество {getSortIcon('quantity')}
-                    </TH>
-                    <TH onClick={() => handleSort('measurement')}>
-                        Единица измерения {getSortIcon('measurement')}
                     </TH>
                     <TH onClick={() => handleSort('weight')}>
                         Масса {getSortIcon('weight')}
@@ -74,32 +119,47 @@ const TableReports = () => {
                     <TH onClick={() => handleSort('note')}>
                         Примечание {getSortIcon('note')}
                     </TH>
+                    <TH>Действия</TH>
                 </TR>
                 </thead>
                 <tbody>
-                {data
-                    .sort((a, b) => {
-                        if (sortColumn) {
-                            const columnA = a[sortColumn];
-                            const columnB = b[sortColumn];
-                            if (columnA < columnB) return sortDirection === 'asc' ? -1 : 1;
-                            if (columnA > columnB) return sortDirection === 'asc' ? 1 : -1;
-                        }
-                        return 0;
-                    })
-                    .map((item) => (
-                        <TR key={item.id}>
-                            <TD>{item.number}</TD>
-                            <TD>{new Date(item.data).toLocaleString()}</TD>
-                            <TD>{item.event}</TD>
-                            <TD>{item.animal}</TD>
-                            <TD>{item.typeAnimal}</TD>
-                            <TD>{item.quantity}</TD>
-                            <TD>{item.measurement}</TD>
-                            <TD>{item.weight}</TD>
-                            <TD>{item.note}</TD>
-                        </TR>
-                    ))}
+                {data.map((item) => (
+                    <TR key={item.id}>
+                        <TD>{item.number}</TD>
+                        <TD>{new Date(item.data).toLocaleString()}</TD>
+                        <TD>{item.event}</TD>
+                        <TD>{item.animal}</TD>
+                        <TD>{item.quantity}</TD>
+                        <TD>{item.weight}</TD>
+                        <TD>{item.note}</TD>
+                        <TD>
+                            {editItemId === item.id ? (
+                                <>
+                                    <ButtonStr
+                                        style={{ marginRight: '5px' }}
+                                        onClick={() => handleSave(item.id)}
+                                    >
+                                        Сохранить
+                                    </ButtonStr>
+                                    <ButtonStr onClick={handleCancel}>Отмена</ButtonStr>
+                                </>
+                            ) : (
+                                <ButtonStr
+                                    style={{ marginRight: 'auto', marginLeft: 'auto', marginBottom: 'auto', padding: '5px 10px' }}
+                                    onClick={() => handleEdit(item.id)}>Редактировать
+                                </ButtonStr>
+                            )}
+                        </TD>
+                        <TD>
+                            <ButtonStr
+                                style={{ marginRight: 'auto', marginLeft: 'auto', marginBottom: 'auto', padding: '5px 10px' }}
+                                onClick={() => handleDelete(item.id)}
+                            >
+                                Удалить
+                            </ButtonStr>
+                        </TD>
+                    </TR>
+                ))}
                 </tbody>
             </Table>
             <Str>
@@ -113,6 +173,56 @@ const TableReports = () => {
                     <ButtonStr onClick={() => handlePageChange(page + 1)}>Next</ButtonStr>
                 )}
             </Str>
+
+            {showModal && (
+                <Modal>
+                    <ModalContent>
+                        <h3>Редактировать элемент</h3>
+                        <form>
+                            <input
+                                type="text"
+                                name="number"
+                                value={editedValues.number || ''}
+                                onChange={handleInputChange}
+                            />
+                            <input
+                                type="text"
+                                name="data"
+                                value={editedValues.data || ''}
+                                onChange={handleInputChange}
+                            />
+                            <input
+                                type="text"
+                                name="event"
+                                value={editedValues.event || ''}
+                                onChange={handleInputChange}
+                            />
+                            <input
+                                type="text"
+                                name="animal"
+                                value={editedValues.animal || ''}
+                                onChange={handleInputChange}
+                            />
+                            <input
+                                type="text"
+                                name="weight"
+                                value={editedValues.weight || ''}
+                                onChange={handleInputChange}
+                            />
+                            <input
+                                type="text"
+                                name="note"
+                                value={editedValues.note || ''}
+                                onChange={handleInputChange}
+                            />
+                        </form>
+                        <div style={{marginTop: '1%'}}>
+                            <ButtonStr onClick={() => handleSave(editItemId)}>Сохранить</ButtonStr>
+                            <ButtonStr onClick={handleCancel}>Отмена</ButtonStr>
+                        </div>
+                    </ModalContent>
+                </Modal>
+            )}
         </TableWrapper>
     );
 };

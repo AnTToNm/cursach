@@ -1,5 +1,5 @@
 import styled from "styled-components";
-export const Container = styled.div`
+export const Container1231 = styled.div`
   display: flex;
   position: absolute;
   z-index: 998;
@@ -10,7 +10,7 @@ export const Container = styled.div`
   left: 0;
   background: rgba(227, 217, 231);
 `
-export const ContainerItem = styled.div`
+export const ContainerItem1231 = styled.div`
   margin: auto;
   width: 35vw;
   height: 30vw;
@@ -19,7 +19,7 @@ export const ContainerItem = styled.div`
   box-shadow: 0 0 2vw rgba(0, 0, 0, 0.25);
 `
 
-export const FormContainer = styled.div`
+export const FormContainer1231 = styled.div`
   padding: 5vw 3vw 2vw 3vw;
   display: flex;
   flex-direction: column;
@@ -44,7 +44,7 @@ export const FormContainer = styled.div`
     color: red;
   }
 `
-export const FormInput = styled.input`
+export const FormInput1231 = styled.input`
   background: #FFFFFF;
   border: .1vw solid #000000;
   border-radius: 2vw;
@@ -56,7 +56,7 @@ export const FormInput = styled.input`
   padding-left: 1vw;
 `
 
-export const FormButton = styled.button`
+export const FormButton1231 = styled.button`
   margin-top: 2vw;
   outline: none;
   background: none;
@@ -70,7 +70,7 @@ export const FormButton = styled.button`
   height: 3vw;
   font-size: 1.6vw;
 `
-export const StyledSpan = styled.div`
+export const StyledSpan1231 = styled.div`
   font-weight: 500;
   font-family: Quicksand,sans-serif;
   font-size: 1.5vw;

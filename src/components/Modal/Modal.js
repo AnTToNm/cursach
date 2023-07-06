@@ -1,6 +1,6 @@
 import {createPortal} from "react-dom";
 import React, {useEffect, useRef, useState} from "react";
-import {Container, ContainerItem, FormButton, FormContainer, FormInput, StyledSpan} from "./Modal.style";
+import {Container1231, ContainerItem1231, FormButton1231, FormContainer1231, FormInput1231, StyledSpan1231} from "./Modal.style";
 import * as Yup from "yup";
 import {ErrorMessage, Field, Form, Formik} from "formik";
 const modalRootElement = document.querySelector('#portal')
@@ -80,64 +80,64 @@ const Modal = (props) => {
     return createPortal(
         <>
             {open ? (
-                <Container>
-                    <ContainerItem ref={ref}>
-                        {forms ? (<FormContainer>Зарегистрируйтесь
+                <Container1231>
+                    <ContainerItem1231 ref={ref}>
+                        {forms ? (<FormContainer1231>Зарегистрируйтесь
                             <Formik initialValues={initialValues} validationSchema={validationSchema}
                                     onSubmit={values => console.log(JSON.stringify(values))}>
                                 {({isSubmitting,isValid,dirty,values,resetForm}) => (
                                     <Form>
                                         <>
-                                            <Field type='name' name='name' as={FormInput}/>
+                                            <Field type='name' placeholder='Nickname' name='name' as={FormInput1231}/>
                                             <ErrorMessage name='name' component='div' className='ErrorMessages'/>
                                         </>
                                         <>
-                                            <Field type='email' name='email' as={FormInput}/>
+                                            <Field type='email' placeholder='E-mail' name='email' as={FormInput1231}/>
                                             <ErrorMessage name='email' component='div' className='ErrorMessages'/>
                                         </>
                                         <>
-                                            <Field type='password' name='password' as={FormInput}/>
+                                            <Field type='password' placeholder='Password' name='password' as={FormInput1231}/>
                                             <ErrorMessage name='password' component='div' className='ErrorMessages'/>
                                         </>
-                                        <FormButton disabled={!(isValid && dirty) || isSubmitting} onClick={async () => {
+                                        <FormButton1231 disabled={!(isValid && dirty) || isSubmitting} onClick={async () => {
                                             isSubmitting = true
                                             await Registration(values.email, values.password,values.name)
                                             setTimeout(() => resetForm(), 500)
                                         }}>
                                             {isSubmitting ? 'Загрузка...' : 'Зарегистрироваться'}
-                                        </FormButton>
+                                        </FormButton1231>
                                     </Form>
                                 )}
                             </Formik>
                             <span>Уже зарегистрированы? <span onClick={()=>setForms(false)}>Войти</span></span>
-                        </FormContainer>) : (<FormContainer>Войдите в аккаунт
+                        </FormContainer1231>) : (<FormContainer1231>Войдите в аккаунт
                             <Formik initialValues={initialValuesForLogin} validationSchema={validationSchemaForLogin}
                                     onSubmit={values => console.log(JSON.stringify(values))}>
                                 {({isSubmitting,isValid,dirty,values,resetForm}) => (
                                     <Form>
                                         <>
-                                            <Field type='email' name='email' as={FormInput}/>
+                                            <Field type='email' placeholder='E-mail' name='email' as={FormInput1231}/>
                                             <ErrorMessage name='email' component='div' className='ErrorMessages'/>
                                         </>
                                         <>
-                                            <Field type='password' name='password' as={FormInput}/>
+                                            <Field type='password' placeholder='Password' name='password' as={FormInput1231}/>
                                             <ErrorMessage name='password' component='div' className='ErrorMessages'/>
                                         </>
-                                        <StyledSpan>Забыли пароль?</StyledSpan>
-                                        <FormButton disabled={!(isValid && dirty) || isSubmitting} onClick={async () => {
+                                        <StyledSpan1231>Забыли пароль?</StyledSpan1231>
+                                        <FormButton1231 disabled={!(isValid && dirty) || isSubmitting} onClick={async () => {
                                             isSubmitting = true
                                             await Login(values.email, values.password)
                                             setTimeout(() => resetForm(), 500)
                                         }}>
                                             {isSubmitting ? 'Загрузка...' : 'Войти'}
-                                        </FormButton>
+                                        </FormButton1231>
                                     </Form>
                                 )}
                             </Formik>
                             <span>Еще нет аккаунта? <span onClick={()=>setForms(true)}>Зарегистрируйтесь</span></span>
-                        </FormContainer>)}
-                    </ContainerItem>
-                </Container>) : null}
+                        </FormContainer1231>)}
+                    </ContainerItem1231>
+                </Container1231>) : null}
         </>
         , modalRootElement);
 }
